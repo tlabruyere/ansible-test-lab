@@ -1,0 +1,36 @@
+---
+# tasks file for php
+
+- name: Install php extensions
+  apt:
+    name: "{{ item }}"
+    state: present
+  become: yes
+  with_items:
+    - php7.2
+    - php7.2-mysql
+    - php7.2-gd
+    - php-ssh2
+    - libmcrypt-dev
+      #    - php7.2-mcrypt
+
+- name: Setup php-fpm-apache2??
+  #  replace: dest=/etc/php/7.2/fpm/php.ini regexp="(;cgi.fix_pathinfo=1)" replace="cgi.fix_pathinfo=0"
+  replace: dest=/etc/php/7.2/apache2/php.ini regexp="(;cgi.fix_pathinfo=1)" replace="cgi.fix_pathinfo=0"
+  notify:
+    - restart nginx
+  become: yes
+
+- name: Setup php-fpm-cli??
+  #  replace: dest=/etc/php/7.2/fpm/php.ini regexp="(;cgi.fix_pathinfo=1)" replace="cgi.fix_pathinfo=0"
+  replace: dest=/etc/php/7.2/cli/php.ini regexp="(;cgi.fix_pathinfo=1)" replace="cgi.fix_pathinfo=0"
+  notify:
+    - restart nginx
+  become: yes
+
+
+- name: Add php settings
+  template: src=../../nginx/templates/nginx-wp-common.conf dest=/etc/nginx/nginx-wp-common.conf owner=www-data group=www-data mode=0644
+  notify:
+    - restart nginx
+  become: yes
